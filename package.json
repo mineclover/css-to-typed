@@ -35,6 +35,10 @@
       {
         "command": "extension.copyInferredType",
         "title": "CSS to Typed: Copy Inferred Type"
+      },
+      {
+        "command": "cssToTyped.copyConstantObject",
+        "title": "CSS to Typed: Copy Constant Object"
       }
     ],
     "configuration": {

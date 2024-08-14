@@ -23,6 +23,8 @@ export type Prettify<T> = {
 engines 버전 맞추기 필수
 커밋 해야 vsce package patch 이 동작함
 
+npm i @vscode/vsce -g
+
 npm run compile
 vsce package patch
-code --install-extension css-to-typed-0.1.14.vsix
+code --install-extension css-to-typed-0.1.19.vsix

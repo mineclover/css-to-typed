@@ -1,3 +1,4 @@
+// fileName: src/hoverProvider.ts
 import * as vscode from "vscode";
 import { getInferredType } from "./typeInference";
 import { inferredTypeMap, setCurrentHoverKey } from "./state";
@@ -29,7 +30,10 @@ export function registerHoverProvider(context: vscode.ExtensionContext) {
             }
 
             contents.appendMarkdown(
-              `<a href="command:cssToTyped.copyInferredType">Copy Inferred Type</a>`
+              `<a href="command:cssToTyped.copyInferredType">Copy Inferred Type</a> | `
+            );
+            contents.appendMarkdown(
+              `<a href="command:cssToTyped.copyConstantObject">Copy Constant Object</a>`
             );
 
             return new vscode.Hover(contents);

@@ -27,4 +27,4 @@ npm i @vscode/vsce -g
 
 npm run compile
 vsce package patch
-code --install-extension css-to-typed-0.1.19.vsix
+code --install-extension css-to-typed-0.1.20.vsix

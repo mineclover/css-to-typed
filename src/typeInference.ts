@@ -1,7 +1,9 @@
+// fileName: src/typeInference.ts
 import * as ts from "typescript";
 import * as vscode from "vscode";
 import * as path from "path";
 import { findProjectRoot, getAllTypeScriptFiles } from "./fileUtils";
+import { formatFunctionType } from "./typeUtils";
 
 export async function getInferredType(
   document: vscode.TextDocument,
@@ -83,13 +85,26 @@ function findNodeAtPosition(
   return find(sourceFile);
 }
 
-function formatType(type: ts.Type, typeChecker: ts.TypeChecker): string {
+function formatType(
+  type: ts.Type,
+  typeChecker: ts.TypeChecker,
+  depth: number = 0
+): string {
+  // 재귀 깊이 제한
+  if (depth > 10) {
+    return "...";
+  }
+
   if (type.isUnion()) {
-    return type.types.map((t) => formatType(t, typeChecker)).join(" | ");
+    return type.types
+      .map((t) => formatType(t, typeChecker, depth + 1))
+      .join(" | ");
   }
 
   if (type.isIntersection()) {
-    return type.types.map((t) => formatType(t, typeChecker)).join(" & ");
+    return type.types
+      .map((t) => formatType(t, typeChecker, depth + 1))
+      .join(" & ");
   }
 
   if (type.isClassOrInterface()) {
@@ -101,13 +116,14 @@ function formatType(type: ts.Type, typeChecker: ts.TypeChecker): string {
       const isOptional = (prop.flags & ts.SymbolFlags.Optional) !== 0;
       return `${prop.name}${isOptional ? "?" : ""}: ${formatType(
         propType,
-        typeChecker
+        typeChecker,
+        depth + 1
       )}`;
     });
     return `{ ${props.join("; ")} }`;
   }
 
-  return typeChecker.typeToString(
+  let typeString = typeChecker.typeToString(
     type,
     undefined,
     ts.TypeFormatFlags.NoTruncation |
@@ -116,4 +132,11 @@ function formatType(type: ts.Type, typeChecker: ts.TypeChecker): string {
       ts.TypeFormatFlags.WriteClassExpressionAsTypeLiteral |
       ts.TypeFormatFlags.InTypeAlias
   );
+
+  // 함수 타입인 경우 포맷팅 적용
+  if (type.getCallSignatures().length > 0) {
+    typeString = formatFunctionType(typeString);
+  }
+
+  return typeString;
 }
